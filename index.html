@@ -2,26 +2,21 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Mencegah zoom otomatis saat tombol di-tap berulang kali -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pixel Clash: Archer vs Gunner</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+    <!-- Peringatan jika HP masih dalam posisi Portrait -->
+    <div id="rotate-warning">
+        <div class="rotate-icon">🔄</div>
+        <p>MOHON PUTAR HP KAMU KESISI LANDSCAPE (MENDATAR)</p>
+    </div>
+
     <div id="game-container">
         <canvas id="gameCanvas" width="900" height="500"></canvas>
-        <!-- Tambahkan ini di dalam <div id="game-container"> di index.html -->
-<div id="touch-controls" class="touch-overlay">
-    <div class="touch-group left-controls">
-        <button id="t-left" class="t-btn">◄</button>
-        <button id="t-right" class="t-btn">►</button>
-        <button id="t-up" class="t-btn">▲</button>
-    </div>
-    <div class="touch-group right-controls">
-        <button id="t-shoot" class="t-btn action-btn">🏹/🔫</button>
-        <button id="t-super" class="t-btn super-btn">⚡ SUPER</button>
-    </div>
-</div>
         
         <!-- Menu Utama -->
         <div id="main-menu" class="ui-overlay">
@@ -52,6 +47,19 @@
             <div class="btn-group">
                 <button id="btn-restart" type="button">Main Lagi</button>
                 <button id="btn-menu" type="button">Menu Utama</button>
+            </div>
+        </div>
+
+        <!-- Tombol Kontrol Layar Sentuh -->
+        <div id="touch-controls" class="touch-overlay">
+            <div class="touch-group left-controls">
+                <button id="t-left" class="t-btn">◄</button>
+                <button id="t-right" class="t-btn">►</button>
+                <button id="t-up" class="t-btn">▲</button>
+            </div>
+            <div class="touch-group right-controls">
+                <button id="t-shoot" class="t-btn action-btn">🏹/🔫</button>
+                <button id="t-super" class="t-btn super-btn">⚡ SUPER</button>
             </div>
         </div>
     </div>
