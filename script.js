@@ -81,7 +81,7 @@ window.addEventListener('DOMContentLoaded', () => {
     let particles = [];
     let items = [];
 
-    const MAX_HP = 100;
+    const MAX_HP = 100; // TOTAL NYAWA 100
 
     const platforms = [
         { x: 0, y: 430, w: 900, h: 70 },
@@ -181,7 +181,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 owner: this,
                 type: this.role,
                 isSuper: isSuper,
-                damage: isSuper ? 5 : 1, // Kena 1 peluru biasa = -1 nyawa
+                damage: isSuper ? 5 : 1, // Kena 1 peluru = nyawa berkurang 1
                 gravity: this.role === 'archer' ? (isSuper ? 0.05 : 0.15) : 0
             });
         }
@@ -426,20 +426,7 @@ window.addEventListener('DOMContentLoaded', () => {
         ctx.textAlign = 'left';
     }
 
-    function startGame(vsCPU) {
-        initAudio();
-        p1 = new Player(120, 200, '#22c55e', 'archer');
-        p2 = new Player(740, 200, '#06b6d4', 'gunner', vsCPU);
-        projectiles = [];
-        items = [];
-        particles = [];
-        gameRunning = true;
-        mainMenu.classList.add('hidden');
-        gameOverMenu.classList.add('hidden');
-        requestAnimationFrame(gameLoop);
-    }
-
-    // --- DI SINI LETAK KONTROL TOUCH UNTUK HP ---
+    // --- LOGIKA SETUP TOMBOL TOUCH LAYAR HP ---
     function setupTouchControls() {
         const bindTouch = (id, code) => {
             const btn = document.getElementById(id);
@@ -450,6 +437,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 initAudio();
                 keys[code] = true;
                 if (code === 'KeyG') p1.shoot(true);
+                if (code === 'KeyL') p2.shoot(true);
             }, { passive: false });
 
             btn.addEventListener('touchend', (e) => {
@@ -458,14 +446,48 @@ window.addEventListener('DOMContentLoaded', () => {
             }, { passive: false });
         };
 
+        // Bind Kontrol Pemain 1
         bindTouch('t-left', 'KeyA');
         bindTouch('t-right', 'KeyD');
         bindTouch('t-up', 'KeyW');
         bindTouch('t-shoot', 'KeyF');
         bindTouch('t-super', 'KeyG');
+
+        // Bind Kontrol Pemain 2 (Untuk Mode Main Berdua)
+        bindTouch('t2-left', 'ArrowLeft');
+        bindTouch('t2-right', 'ArrowRight');
+        bindTouch('t2-up', 'ArrowUp');
+        bindTouch('t2-shoot', 'Enter');
+        bindTouch('t2-super', 'KeyL');
     }
 
-    setupTouchControls(); // Memanggil fungsi touch controls
+    setupTouchControls();
+
+    function startGame(vsCPU) {
+        initAudio();
+        p1 = new Player(120, 200, '#22c55e', 'archer');
+        p2 = new Player(740, 200, '#06b6d4', 'gunner', vsCPU);
+        projectiles = [];
+        items = [];
+        particles = [];
+        gameRunning = true;
+
+        // Atur Tampilan Kontrol Layar
+        const p2TouchUI = document.getElementById('p2-touch');
+        if (p2TouchUI) {
+            if (vsCPU) {
+                // Sembunyikan Kontrol P2 jika lawan CPU
+                p2TouchUI.classList.add('hidden');
+            } else {
+                // Tampilkan Kontrol P2 jika Mode 2 Player
+                p2TouchUI.classList.remove('hidden');
+            }
+        }
+
+        mainMenu.classList.add('hidden');
+        gameOverMenu.classList.add('hidden');
+        requestAnimationFrame(gameLoop);
+    }
 
     if (btnVsCpu) btnVsCpu.onclick = () => startGame(true);
     if (btnVsPlayer) btnVsPlayer.onclick = () => startGame(false);
