@@ -11,7 +11,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const btnRestart = document.getElementById('btn-restart');
     const btnMenu = document.getElementById('btn-menu');
 
-    // Sound Synthesizer (Web Audio API)
+    // Audio Context
     let audioCtx = null;
 
     function initAudio() { 
@@ -35,51 +35,53 @@ window.addEventListener('DOMContentLoaded', () => {
 
             if (type === 'bow') {
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(400, now);
-                osc.frequency.exponentialRampToValueAtTime(150, now + 0.1);
+                osc.frequency.setValueAtTime(500, now);
+                osc.frequency.exponentialRampToValueAtTime(200, now + 0.08);
                 gain.gain.setValueAtTime(0.3, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
-                osc.start(now); osc.stop(now + 0.1);
-            } else if (type === 'gun') {
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(800, now);
-                osc.frequency.exponentialRampToValueAtTime(100, now + 0.08);
-                gain.gain.setValueAtTime(0.2, now);
                 gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
                 osc.start(now); osc.stop(now + 0.08);
+            } else if (type === 'gun') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(900, now);
+                osc.frequency.exponentialRampToValueAtTime(120, now + 0.05);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
+                osc.start(now); osc.stop(now + 0.05);
             } else if (type === 'hit') {
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(200, now);
-                osc.frequency.exponentialRampToValueAtTime(50, now + 0.12);
+                osc.frequency.setValueAtTime(250, now);
+                osc.frequency.exponentialRampToValueAtTime(60, now + 0.1);
+                gain.gain.setValueAtTime(0.35, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
+            } else if (type === 'super') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(1000, now + 0.2);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now); osc.stop(now + 0.2);
+            } else if (type === 'item') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(950, now + 0.12);
                 gain.gain.setValueAtTime(0.3, now);
                 gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
                 osc.start(now); osc.stop(now + 0.12);
-            } else if (type === 'super') {
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(300, now);
-                osc.frequency.exponentialRampToValueAtTime(900, now + 0.25);
-                gain.gain.setValueAtTime(0.4, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
-                osc.start(now); osc.stop(now + 0.25);
-            } else if (type === 'item') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(523, now);
-                osc.frequency.exponentialRampToValueAtTime(880, now + 0.15);
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
-                osc.start(now); osc.stop(now + 0.15);
             }
         } catch (e) {
             console.error(e);
         }
     }
 
-    // Game State & Variables
+    // Game Variables
     let gameRunning = false;
     let keys = {};
     let projectiles = [];
     let particles = [];
     let items = [];
+
+    const MAX_HP = 10; // Total 10 Nyawa/Peluru Kena
 
     const platforms = [
         { x: 0, y: 430, w: 900, h: 70 },
@@ -98,22 +100,25 @@ window.addEventListener('DOMContentLoaded', () => {
             this.vy = 0;
             this.color = color;
             this.role = role;
-            this.hp = 100;
+            this.hp = MAX_HP; // Menggunakan sistem jumlah hit
             this.energy = 0;
             this.isGrounded = false;
             this.facing = role === 'archer' ? 'right' : 'left';
             this.shootCooldown = 0;
             this.isCPU = isCPU;
             this.hitStun = 0;
+            this.invincible = 0; // Waktu kebal sesaat setelah kena hit
         }
 
         update() {
             if (this.hitStun > 0) this.hitStun--;
+            if (this.invincible > 0) this.invincible--;
 
-            this.vy += 0.75;
+            // FISIKA TEMPO CEPAT: Gravitasi & Pergerakan lebih responsif
+            this.vy += 0.95; 
             this.x += this.vx;
             this.y += this.vy;
-            this.vx *= 0.82;
+            this.vx *= 0.84;
 
             this.isGrounded = false;
             for (let p of platforms) {
@@ -130,10 +135,13 @@ window.addEventListener('DOMContentLoaded', () => {
             if (this.x + this.w > canvas.width) this.x = canvas.width - this.w;
 
             if (this.shootCooldown > 0) this.shootCooldown--;
-            if (this.energy < 100) this.energy += 0.08;
+            if (this.energy < 100) this.energy += 0.25; // Isi energy lebih cepat
         }
 
         draw() {
+            // Efek kedip saat kebal / hit
+            if (this.invincible % 4 > 2) return;
+
             ctx.fillStyle = this.hitStun > 0 ? '#ffffff' : this.color;
             ctx.fillRect(this.x, this.y, this.w, this.h);
 
@@ -160,21 +168,25 @@ window.addEventListener('DOMContentLoaded', () => {
                 playSound(this.role === 'archer' ? 'bow' : 'gun');
             }
 
-            this.shootCooldown = isSuper ? 35 : (this.role === 'archer' ? 18 : 12);
-            let pVx = this.facing === 'right' ? (isSuper ? 16 : 12) : (isSuper ? -16 : -12);
-            let pVy = this.role === 'archer' ? (isSuper ? -2 : -3.5) : (isSuper ? 0 : (Math.random() - 0.5) * 1.5);
+            // TEMPO CEPAT: Cooldown tembak dipersingkat
+            this.shootCooldown = isSuper ? 25 : (this.role === 'archer' ? 10 : 7);
+            
+            // Peluru bergerak jauh lebih cepat
+            let pVx = this.facing === 'right' ? (isSuper ? 22 : 18) : (isSuper ? -22 : -18);
+            let pVy = this.role === 'archer' ? (isSuper ? -1.5 : -2.5) : (isSuper ? 0 : (Math.random() - 0.5) * 2);
 
             projectiles.push({
                 x: this.facing === 'right' ? this.x + this.w + 5 : this.x - 15,
                 y: this.y + 22,
                 vx: pVx,
                 vy: pVy,
-                w: isSuper ? 24 : (this.role === 'archer' ? 16 : 10),
-                h: isSuper ? 10 : (this.role === 'archer' ? 4 : 6),
+                w: isSuper ? 28 : (this.role === 'archer' ? 18 : 12),
+                h: isSuper ? 12 : (this.role === 'archer' ? 5 : 6),
                 owner: this,
                 type: this.role,
                 isSuper: isSuper,
-                gravity: this.role === 'archer' ? (isSuper ? 0.08 : 0.22) : 0
+                damage: isSuper ? 2 : 1, // Super = minus 2 nyawa, Biasa = minus 1 nyawa
+                gravity: this.role === 'archer' ? (isSuper ? 0.05 : 0.15) : 0
             });
         }
     }
@@ -186,26 +198,26 @@ window.addEventListener('DOMContentLoaded', () => {
         for (let i = 0; i < count; i++) {
             particles.push({
                 x, y,
-                vx: (Math.random() - 0.5) * 8,
-                vy: (Math.random() - 0.5) * 8,
+                vx: (Math.random() - 0.5) * 12,
+                vy: (Math.random() - 0.5) * 12,
                 color,
-                life: 18
+                life: 14
             });
         }
     }
 
     function spawnItem() {
         if (!gameRunning) return;
-        if (items.length < 2 && Math.random() < 0.4) {
+        if (items.length < 2 && Math.random() < 0.5) {
             items.push({
                 x: 150 + Math.random() * 600,
                 y: 0,
-                type: Math.random() > 0.5 ? 'heal' : 'energy',
+                type: Math.random() > 0.4 ? 'heal' : 'energy',
                 w: 22, h: 22
             });
         }
     }
-    setInterval(spawnItem, 6000);
+    setInterval(spawnItem, 4000); // Item muncul lebih sering
 
     function checkCollision(r1, r2) {
         return r1.x < r2.x + r2.w &&
@@ -218,21 +230,22 @@ window.addEventListener('DOMContentLoaded', () => {
         if (!p2.isCPU) return;
 
         let dist = p1.x - p2.x;
-        if (Math.abs(dist) > 300) {
-            p2.vx = dist > 0 ? 3.5 : -3.5;
-        } else if (Math.abs(dist) < 120) {
-            p2.vx = dist > 0 ? -3.5 : 3.5;
+        // CPU LEBIH AGRESIF & GESIT
+        if (Math.abs(dist) > 220) {
+            p2.vx = dist > 0 ? 5.5 : -5.5;
+        } else if (Math.abs(dist) < 90) {
+            p2.vx = dist > 0 ? -5.5 : 5.5;
         }
         p2.facing = dist > 0 ? 'right' : 'left';
 
-        if ((p1.y < p2.y - 40 || Math.random() < 0.02) && p2.isGrounded) {
-            p2.vy = -13;
+        if ((p1.y < p2.y - 40 || Math.random() < 0.04) && p2.isGrounded) {
+            p2.vy = -15;
         }
 
-        if (Math.abs(p1.y - p2.y) < 80) {
-            if (p2.energy >= 100 && Math.random() < 0.08) {
+        if (Math.abs(p1.y - p2.y) < 100) {
+            if (p2.energy >= 100 && Math.random() < 0.15) {
                 p2.shoot(true);
-            } else if (Math.random() < 0.2) {
+            } else if (Math.random() < 0.35) {
                 p2.shoot(false);
             }
         }
@@ -249,15 +262,16 @@ window.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('keyup', (e) => { keys[e.code] = false; });
 
     function handleInput() {
-        if (keys['KeyA']) { p1.vx = -5; p1.facing = 'left'; }
-        if (keys['KeyD']) { p1.vx = 5; p1.facing = 'right'; }
-        if (keys['KeyW'] && p1.isGrounded) p1.vy = -13.5;
+        // TEMPO CEPAT: Kecepatan lari ditingkatkan (8px/frame)
+        if (keys['KeyA']) { p1.vx = -8; p1.facing = 'left'; }
+        if (keys['KeyD']) { p1.vx = 8; p1.facing = 'right'; }
+        if (keys['KeyW'] && p1.isGrounded) p1.vy = -15;
         if (keys['KeyF']) p1.shoot(false);
 
         if (!p2.isCPU) {
-            if (keys['ArrowLeft']) { p2.vx = -5; p2.facing = 'left'; }
-            if (keys['ArrowRight']) { p2.vx = 5; p2.facing = 'right'; }
-            if (keys['ArrowUp'] && p2.isGrounded) p2.vy = -13.5;
+            if (keys['ArrowLeft']) { p2.vx = -8; p2.facing = 'left'; }
+            if (keys['ArrowRight']) { p2.vx = 8; p2.facing = 'right'; }
+            if (keys['ArrowUp'] && p2.isGrounded) p2.vy = -15;
             if (keys['Enter']) p2.shoot(false);
         }
     }
@@ -273,6 +287,7 @@ window.addEventListener('DOMContentLoaded', () => {
         p1.update();
         p2.update();
 
+        // Gambar Platform
         ctx.fillStyle = '#334155';
         platforms.forEach(p => {
             ctx.fillRect(p.x, p.y, p.w, p.h);
@@ -281,8 +296,9 @@ window.addEventListener('DOMContentLoaded', () => {
             ctx.fillStyle = '#334155';
         });
 
+        // Gambar Items
         items.forEach((item, index) => {
-            item.y += 2.5;
+            item.y += 3.5;
             platforms.forEach(p => {
                 if (checkCollision(item, p)) item.y = p.y - item.h;
             });
@@ -292,8 +308,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
             [p1, p2].forEach(p => {
                 if (checkCollision(item, p)) {
-                    if (item.type === 'heal') p.hp = Math.min(100, p.hp + 30);
-                    if (item.type === 'energy') p.energy = Math.min(100, p.energy + 60);
+                    if (item.type === 'heal') p.hp = Math.min(MAX_HP, p.hp + 2); // Tambah +2 nyawa
+                    if (item.type === 'energy') p.energy = Math.min(100, p.energy + 50);
                     playSound('item');
                     createParticles(item.x + 11, item.y + 11, item.type === 'heal' ? '#22c55e' : '#eab308', 15);
                     items.splice(index, 1);
@@ -301,6 +317,7 @@ window.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        // Update Peluru
         projectiles.forEach((proj, pIndex) => {
             proj.x += proj.vx;
             proj.vy += proj.gravity;
@@ -317,16 +334,17 @@ window.addEventListener('DOMContentLoaded', () => {
             });
 
             let target = proj.owner === p1 ? p2 : p1;
-            if (checkCollision(proj, target)) {
-                let dmg = proj.isSuper ? 32 : (proj.type === 'archer' ? 14 : 10);
-                target.hp -= dmg;
-                target.vx = proj.vx > 0 ? 8 : -8;
-                target.vy = -4;
-                target.hitStun = 8;
-                proj.owner.energy = Math.min(100, proj.owner.energy + 12);
+            // Deteksi Kena Hit
+            if (target.invincible <= 0 && checkCollision(proj, target)) {
+                target.hp -= proj.damage; // Mengurangi jumlah nyawa
+                target.vx = proj.vx > 0 ? 10 : -10;
+                target.vy = -5;
+                target.hitStun = 6;
+                target.invincible = 12; // Waktu kebal singkat agar tidak langsung habis sekaligus
+                proj.owner.energy = Math.min(100, proj.owner.energy + 20);
 
                 playSound('hit');
-                createParticles(target.x + 19, target.y + 29, '#ef4444', 16);
+                createParticles(target.x + 19, target.y + 29, '#ef4444', 18);
                 projectiles.splice(pIndex, 1);
             }
 
@@ -335,6 +353,7 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // Particles
         particles.forEach((pt, index) => {
             pt.x += pt.vx;
             pt.y += pt.vy;
@@ -362,66 +381,63 @@ window.addEventListener('DOMContentLoaded', () => {
 
     function drawUI() {
         // --- UI PEMAIN 1 (KIRI) ---
-        // Label Nama & Status
         ctx.fillStyle = '#f8fafc';
         ctx.font = 'bold 14px sans-serif';
         ctx.fillText('🏹 ARCHER (P1)', 20, 20);
 
-        // Frame / Background Bar HP P1 (Dibuat lebih tebal: tinggi 30px)
+        // Frame Bar HP P1
         ctx.fillStyle = '#0f172a';
-        ctx.fillRect(20, 28, 260, 30);
+        ctx.fillRect(20, 28, 260, 32);
         ctx.strokeStyle = '#334155';
         ctx.lineWidth = 3;
-        ctx.strokeRect(20, 28, 260, 30);
+        ctx.strokeRect(20, 28, 260, 32);
 
-        // Isi Bar HP P1
-        let hpWidthP1 = Math.max(0, (p1.hp / 100) * 256);
-        ctx.fillStyle = p1.hp > 30 ? '#22c55e' : '#ef4444'; // Merah jika kritis
-        ctx.fillRect(22, 30, hpWidthP1, 26);
+        // Isi Bar HP P1 (Berdasarkan jumlah nyawa 0-10)
+        let hpWidthP1 = Math.max(0, (p1.hp / MAX_HP) * 256);
+        ctx.fillStyle = p1.hp > 3 ? '#22c55e' : '#ef4444';
+        ctx.fillRect(22, 30, hpWidthP1, 28);
 
-        // Teks Angka HP P1
+        // Teks Sisa Nyawa (Satu Peluru = 1 Nyawa)
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 12px sans-serif';
-        ctx.fillText(`${Math.max(0, Math.ceil(p1.hp))} / 100`, 30, 47);
+        ctx.font = 'bold 13px sans-serif';
+        ctx.fillText(`Nyawa: ${Math.max(0, p1.hp)} / ${MAX_HP}`, 30, 49);
 
-        // Bar Energi P1 (Tinggi 10px)
+        // Bar Energi P1
         ctx.fillStyle = '#0f172a';
-        ctx.fillRect(20, 62, 260, 10);
+        ctx.fillRect(20, 64, 260, 10);
         ctx.fillStyle = '#0284c7';
-        ctx.fillRect(20, 62, (p1.energy / 100) * 260, 10);
+        ctx.fillRect(20, 64, (p1.energy / 100) * 260, 10);
 
 
         // --- UI PEMAIN 2 / CPU (KANAN) ---
-        // Label Nama & Status
         ctx.fillStyle = '#f8fafc';
         ctx.font = 'bold 14px sans-serif';
         ctx.textAlign = 'right';
         ctx.fillText(p2.isCPU ? '🔫 GUNNER (CPU)' : '🔫 GUNNER (P2)', 880, 20);
 
-        // Frame / Background Bar HP P2
+        // Frame Bar HP P2
         ctx.fillStyle = '#0f172a';
-        ctx.fillRect(620, 28, 260, 30);
+        ctx.fillRect(620, 28, 260, 32);
         ctx.strokeStyle = '#334155';
         ctx.lineWidth = 3;
-        ctx.strokeRect(620, 28, 260, 30);
+        ctx.strokeRect(620, 28, 260, 32);
 
         // Isi Bar HP P2
-        let hpWidthP2 = Math.max(0, (p2.hp / 100) * 256);
-        ctx.fillStyle = p2.hp > 30 ? '#22c55e' : '#ef4444';
-        ctx.fillRect(878 - hpWidthP2, 30, hpWidthP2, 26);
+        let hpWidthP2 = Math.max(0, (p2.hp / MAX_HP) * 256);
+        ctx.fillStyle = p2.hp > 3 ? '#22c55e' : '#ef4444';
+        ctx.fillRect(878 - hpWidthP2, 30, hpWidthP2, 28);
 
-        // Teks Angka HP P2
+        // Teks Sisa Nyawa P2
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 12px sans-serif';
-        ctx.fillText(`${Math.max(0, Math.ceil(p2.hp))} / 100`, 870, 47);
+        ctx.font = 'bold 13px sans-serif';
+        ctx.fillText(`Nyawa: ${Math.max(0, p2.hp)} / ${MAX_HP}`, 870, 49);
 
-        // Bar Energi P2 (Tinggi 10px)
+        // Bar Energi P2
         ctx.fillStyle = '#0f172a';
-        ctx.fillRect(620, 62, 260, 10);
+        ctx.fillRect(620, 64, 260, 10);
         ctx.fillStyle = '#0284c7';
-        ctx.fillRect(880 - ((p2.energy / 100) * 260), 62, (p2.energy / 100) * 260, 10);
+        ctx.fillRect(880 - ((p2.energy / 100) * 260), 64, (p2.energy / 100) * 260, 10);
 
-        // Reset alignment teks
         ctx.textAlign = 'left';
     }
 
@@ -438,7 +454,6 @@ window.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(gameLoop);
     }
 
-    // Direct Event Listeners
     if (btnVsCpu) btnVsCpu.onclick = () => startGame(true);
     if (btnVsPlayer) btnVsPlayer.onclick = () => startGame(false);
     if (btnRestart) btnRestart.onclick = () => startGame(p2.isCPU);
