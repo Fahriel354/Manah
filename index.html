@@ -2,14 +2,12 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <!-- Mencegah zoom otomatis saat tombol di-tap berulang kali -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pixel Clash: Archer vs Gunner</title>
+    <title>Pixel Clash</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Peringatan jika HP masih dalam posisi Portrait -->
     <div id="rotate-warning">
         <div class="rotate-icon">🔄</div>
         <p>MOHON PUTAR HP KAMU KESISI LANDSCAPE (MENDATAR)</p>
@@ -26,41 +24,46 @@
                 <button id="btn-vs-cpu" type="button">Main Soliter (vs CPU)</button>
                 <button id="btn-vs-player" type="button">Main Berdua (2P)</button>
             </div>
-            <div class="controls-card">
-                <div>
-                    <h3>🏹 P1 (Pemanah / Kiri)</h3>
-                    [A][D] Jalan | [W] Lompat<br>
-                    [F] Panah Biasa | [G] Panah Super
-                </div>
-                <div>
-                    <h3>🔫 P2 / CPU (Penembak / Kanan)</h3>
-                    [Panah] Jalan | [Atas] Lompat<br>
-                    [Enter] Tembak | [L] Peluru Super
-                </div>
-            </div>
         </div>
 
         <!-- Menu Game Over -->
         <div id="game-over-menu" class="ui-overlay hidden">
             <h1 id="winner-title">Pemain 1 Menang!</h1>
-            <p id="sub-title">Sertai pertarungan berikutnya!</p>
             <div class="btn-group">
                 <button id="btn-restart" type="button">Main Lagi</button>
                 <button id="btn-menu" type="button">Menu Utama</button>
             </div>
         </div>
 
-        <!-- Tombol Kontrol Layar Sentuh -->
+        <!-- OVERLAY KONTROL LAYAR SENTUH -->
         <div id="touch-controls" class="touch-overlay">
-            <div class="touch-group left-controls">
-                <button id="t-left" class="t-btn">◄</button>
-                <button id="t-right" class="t-btn">►</button>
-                <button id="t-up" class="t-btn">▲</button>
+            
+            <!-- === KONTROL P1 (SELALU MUNCUL) === -->
+            <div id="p1-touch" class="p-controls">
+                <div class="dpad">
+                    <button id="t-left" class="t-btn">◄</button>
+                    <button id="t-right" class="t-btn">►</button>
+                    <button id="t-up" class="t-btn jump-btn">▲</button>
+                </div>
+                <div class="actions">
+                    <button id="t-shoot" class="t-btn action-btn">🏹</button>
+                    <button id="t-super" class="t-btn super-btn">⚡ SUPER</button>
+                </div>
             </div>
-            <div class="touch-group right-controls">
-                <button id="t-shoot" class="t-btn action-btn">🏹/🔫</button>
-                <button id="t-super" class="t-btn super-btn">⚡ SUPER</button>
+
+            <!-- === KONTROL P2 (HANYA MUNCUL SAAT MAIN BERDUA) === -->
+            <div id="p2-touch" class="p-controls p2-layout hidden">
+                <div class="actions">
+                    <button id="t2-shoot" class="t-btn action-btn p2-theme">🔫</button>
+                    <button id="t2-super" class="t-btn super-btn p2-theme">⚡ SUPER</button>
+                </div>
+                <div class="dpad">
+                    <button id="t2-left" class="t-btn p2-theme">◄</button>
+                    <button id="t2-right" class="t-btn p2-theme">►</button>
+                    <button id="t2-up" class="t-btn jump-btn p2-theme">▲</button>
+                </div>
             </div>
+
         </div>
     </div>
 
