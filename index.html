@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Clash: Archer vs Gunner</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="game-container">
+        <canvas id="gameCanvas" width="900" height="500"></canvas>
+        
+        <!-- Menu Utama -->
+        <div id="main-menu" class="ui-overlay">
+            <h1>PIXEL CLASH</h1>
+            <p>🏹 Pemanah vs 🔫 Penembak Arena</p>
+            <div class="btn-group">
+                <button id="btn-vs-cpu">Main Soliter (vs CPU)</button>
+                <button id="btn-vs-player">Main Berdua (2P)</button>
+            </div>
+            <div class="controls-card">
+                <div>
+                    <h3>🏹 P1 (Pemanah / Kiri)</h3>
+                    [A][D] Jalan | [W] Lompat<br>
+                    [F] Panah Biasa | [G] Panah Super
+                </div>
+                <div>
+                    <h3>🔫 P2 / CPU (Penembak / Kanan)</h3>
+                    [Panah] Jalan | [Atas] Lompat<br>
+                    [Enter] Tembak | [L] Peluru Super
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu Game Over -->
+        <div id="game-over-menu" class="ui-overlay hidden">
+            <h1 id="winner-title">Pemain 1 Menang!</h1>
+            <p id="sub-title">Sertai pertarungan berikutnya!</p>
+            <div class="btn-group">
+                <button id="btn-restart">Main Lagi</button>
+                <button id="btn-menu">Menu Utama</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
