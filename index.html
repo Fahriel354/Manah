@@ -10,6 +10,18 @@
 
     <div id="game-container">
         <canvas id="gameCanvas" width="900" height="500"></canvas>
+        <!-- Tambahkan ini di dalam <div id="game-container"> di index.html -->
+<div id="touch-controls" class="touch-overlay">
+    <div class="touch-group left-controls">
+        <button id="t-left" class="t-btn">◄</button>
+        <button id="t-right" class="t-btn">►</button>
+        <button id="t-up" class="t-btn">▲</button>
+    </div>
+    <div class="touch-group right-controls">
+        <button id="t-shoot" class="t-btn action-btn">🏹/🔫</button>
+        <button id="t-super" class="t-btn super-btn">⚡ SUPER</button>
+    </div>
+</div>
         
         <!-- Menu Utama -->
         <div id="main-menu" class="ui-overlay">
