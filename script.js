@@ -81,7 +81,7 @@ window.addEventListener('DOMContentLoaded', () => {
     let particles = [];
     let items = [];
 
-    const MAX_HP = 10; // Total 10 Nyawa/Peluru Kena
+    const MAX_HP = 100; // TOTAL NYAWA 100
 
     const platforms = [
         { x: 0, y: 430, w: 900, h: 70 },
@@ -100,21 +100,21 @@ window.addEventListener('DOMContentLoaded', () => {
             this.vy = 0;
             this.color = color;
             this.role = role;
-            this.hp = MAX_HP; // Menggunakan sistem jumlah hit
+            this.hp = MAX_HP; // Nyawa awal 100
             this.energy = 0;
             this.isGrounded = false;
             this.facing = role === 'archer' ? 'right' : 'left';
             this.shootCooldown = 0;
             this.isCPU = isCPU;
             this.hitStun = 0;
-            this.invincible = 0; // Waktu kebal sesaat setelah kena hit
+            this.invincible = 0;
         }
 
         update() {
             if (this.hitStun > 0) this.hitStun--;
             if (this.invincible > 0) this.invincible--;
 
-            // FISIKA TEMPO CEPAT: Gravitasi & Pergerakan lebih responsif
+            // FISIKA TEMPO CEPAT
             this.vy += 0.95; 
             this.x += this.vx;
             this.y += this.vy;
@@ -135,11 +135,10 @@ window.addEventListener('DOMContentLoaded', () => {
             if (this.x + this.w > canvas.width) this.x = canvas.width - this.w;
 
             if (this.shootCooldown > 0) this.shootCooldown--;
-            if (this.energy < 100) this.energy += 0.25; // Isi energy lebih cepat
+            if (this.energy < 100) this.energy += 0.3; 
         }
 
         draw() {
-            // Efek kedip saat kebal / hit
             if (this.invincible % 4 > 2) return;
 
             ctx.fillStyle = this.hitStun > 0 ? '#ffffff' : this.color;
@@ -168,10 +167,8 @@ window.addEventListener('DOMContentLoaded', () => {
                 playSound(this.role === 'archer' ? 'bow' : 'gun');
             }
 
-            // TEMPO CEPAT: Cooldown tembak dipersingkat
-            this.shootCooldown = isSuper ? 25 : (this.role === 'archer' ? 10 : 7);
+            this.shootCooldown = isSuper ? 20 : (this.role === 'archer' ? 8 : 6);
             
-            // Peluru bergerak jauh lebih cepat
             let pVx = this.facing === 'right' ? (isSuper ? 22 : 18) : (isSuper ? -22 : -18);
             let pVy = this.role === 'archer' ? (isSuper ? -1.5 : -2.5) : (isSuper ? 0 : (Math.random() - 0.5) * 2);
 
@@ -185,7 +182,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 owner: this,
                 type: this.role,
                 isSuper: isSuper,
-                damage: isSuper ? 2 : 1, // Super = minus 2 nyawa, Biasa = minus 1 nyawa
+                damage: isSuper ? 5 : 1, // Peluru biasa = berkurang 1, Peluru super = berkurang 5
                 gravity: this.role === 'archer' ? (isSuper ? 0.05 : 0.15) : 0
             });
         }
@@ -217,7 +214,7 @@ window.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
-    setInterval(spawnItem, 4000); // Item muncul lebih sering
+    setInterval(spawnItem, 4000);
 
     function checkCollision(r1, r2) {
         return r1.x < r2.x + r2.w &&
@@ -230,7 +227,6 @@ window.addEventListener('DOMContentLoaded', () => {
         if (!p2.isCPU) return;
 
         let dist = p1.x - p2.x;
-        // CPU LEBIH AGRESIF & GESIT
         if (Math.abs(dist) > 220) {
             p2.vx = dist > 0 ? 5.5 : -5.5;
         } else if (Math.abs(dist) < 90) {
@@ -262,7 +258,6 @@ window.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('keyup', (e) => { keys[e.code] = false; });
 
     function handleInput() {
-        // TEMPO CEPAT: Kecepatan lari ditingkatkan (8px/frame)
         if (keys['KeyA']) { p1.vx = -8; p1.facing = 'left'; }
         if (keys['KeyD']) { p1.vx = 8; p1.facing = 'right'; }
         if (keys['KeyW'] && p1.isGrounded) p1.vy = -15;
@@ -287,7 +282,7 @@ window.addEventListener('DOMContentLoaded', () => {
         p1.update();
         p2.update();
 
-        // Gambar Platform
+        // Platform
         ctx.fillStyle = '#334155';
         platforms.forEach(p => {
             ctx.fillRect(p.x, p.y, p.w, p.h);
@@ -296,7 +291,7 @@ window.addEventListener('DOMContentLoaded', () => {
             ctx.fillStyle = '#334155';
         });
 
-        // Gambar Items
+        // Items
         items.forEach((item, index) => {
             item.y += 3.5;
             platforms.forEach(p => {
@@ -308,7 +303,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
             [p1, p2].forEach(p => {
                 if (checkCollision(item, p)) {
-                    if (item.type === 'heal') p.hp = Math.min(MAX_HP, p.hp + 2); // Tambah +2 nyawa
+                    if (item.type === 'heal') p.hp = Math.min(MAX_HP, p.hp + 15); // Heal +15 nyawa
                     if (item.type === 'energy') p.energy = Math.min(100, p.energy + 50);
                     playSound('item');
                     createParticles(item.x + 11, item.y + 11, item.type === 'heal' ? '#22c55e' : '#eab308', 15);
@@ -317,7 +312,7 @@ window.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Update Peluru
+        // Peluru
         projectiles.forEach((proj, pIndex) => {
             proj.x += proj.vx;
             proj.vy += proj.gravity;
@@ -334,17 +329,16 @@ window.addEventListener('DOMContentLoaded', () => {
             });
 
             let target = proj.owner === p1 ? p2 : p1;
-            // Deteksi Kena Hit
             if (target.invincible <= 0 && checkCollision(proj, target)) {
-                target.hp -= proj.damage; // Mengurangi jumlah nyawa
-                target.vx = proj.vx > 0 ? 10 : -10;
-                target.vy = -5;
-                target.hitStun = 6;
-                target.invincible = 12; // Waktu kebal singkat agar tidak langsung habis sekaligus
-                proj.owner.energy = Math.min(100, proj.owner.energy + 20);
+                target.hp -= proj.damage; // Mengurangi tepat 1 nyawa per peluru biasa
+                target.vx = proj.vx > 0 ? 8 : -8;
+                target.vy = -4;
+                target.hitStun = 5;
+                target.invincible = 6; // Bebas dari kebal lebih cepat untuk tempo rapat
+                proj.owner.energy = Math.min(100, proj.owner.energy + 15);
 
                 playSound('hit');
-                createParticles(target.x + 19, target.y + 29, '#ef4444', 18);
+                createParticles(target.x + 19, target.y + 29, '#ef4444', 16);
                 projectiles.splice(pIndex, 1);
             }
 
@@ -392,15 +386,15 @@ window.addEventListener('DOMContentLoaded', () => {
         ctx.lineWidth = 3;
         ctx.strokeRect(20, 28, 260, 32);
 
-        // Isi Bar HP P1 (Berdasarkan jumlah nyawa 0-10)
+        // Isi Bar HP P1 (Persentase dari 100 HP)
         let hpWidthP1 = Math.max(0, (p1.hp / MAX_HP) * 256);
-        ctx.fillStyle = p1.hp > 3 ? '#22c55e' : '#ef4444';
+        ctx.fillStyle = p1.hp > 30 ? '#22c55e' : '#ef4444';
         ctx.fillRect(22, 30, hpWidthP1, 28);
 
-        // Teks Sisa Nyawa (Satu Peluru = 1 Nyawa)
+        // Teks Angka Nyawa P1 (100 -> 99 -> 98 dst.)
         ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 13px sans-serif';
-        ctx.fillText(`Nyawa: ${Math.max(0, p1.hp)} / ${MAX_HP}`, 30, 49);
+        ctx.fillText(`${Math.max(0, Math.ceil(p1.hp))} / 100 HP`, 30, 49);
 
         // Bar Energi P1
         ctx.fillStyle = '#0f172a';
@@ -424,13 +418,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
         // Isi Bar HP P2
         let hpWidthP2 = Math.max(0, (p2.hp / MAX_HP) * 256);
-        ctx.fillStyle = p2.hp > 3 ? '#22c55e' : '#ef4444';
+        ctx.fillStyle = p2.hp > 30 ? '#22c55e' : '#ef4444';
         ctx.fillRect(878 - hpWidthP2, 30, hpWidthP2, 28);
 
-        // Teks Sisa Nyawa P2
+        // Teks Angka Nyawa P2
         ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 13px sans-serif';
-        ctx.fillText(`Nyawa: ${Math.max(0, p2.hp)} / ${MAX_HP}`, 870, 49);
+        ctx.fillText(`${Math.max(0, Math.ceil(p2.hp))} / 100 HP`, 870, 49);
 
         // Bar Energi P2
         ctx.fillStyle = '#0f172a';
