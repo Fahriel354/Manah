@@ -81,7 +81,7 @@ window.addEventListener('DOMContentLoaded', () => {
     let particles = [];
     let items = [];
 
-    const MAX_HP = 100; // TOTAL NYAWA 100
+    const MAX_HP = 100;
 
     const platforms = [
         { x: 0, y: 430, w: 900, h: 70 },
@@ -100,7 +100,7 @@ window.addEventListener('DOMContentLoaded', () => {
             this.vy = 0;
             this.color = color;
             this.role = role;
-            this.hp = MAX_HP; // Nyawa awal 100
+            this.hp = MAX_HP;
             this.energy = 0;
             this.isGrounded = false;
             this.facing = role === 'archer' ? 'right' : 'left';
@@ -114,7 +114,6 @@ window.addEventListener('DOMContentLoaded', () => {
             if (this.hitStun > 0) this.hitStun--;
             if (this.invincible > 0) this.invincible--;
 
-            // FISIKA TEMPO CEPAT
             this.vy += 0.95; 
             this.x += this.vx;
             this.y += this.vy;
@@ -182,7 +181,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 owner: this,
                 type: this.role,
                 isSuper: isSuper,
-                damage: isSuper ? 5 : 1, // Peluru biasa = berkurang 1, Peluru super = berkurang 5
+                damage: isSuper ? 5 : 1, // Kena 1 peluru biasa = -1 nyawa
                 gravity: this.role === 'archer' ? (isSuper ? 0.05 : 0.15) : 0
             });
         }
@@ -303,7 +302,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
             [p1, p2].forEach(p => {
                 if (checkCollision(item, p)) {
-                    if (item.type === 'heal') p.hp = Math.min(MAX_HP, p.hp + 15); // Heal +15 nyawa
+                    if (item.type === 'heal') p.hp = Math.min(MAX_HP, p.hp + 15);
                     if (item.type === 'energy') p.energy = Math.min(100, p.energy + 50);
                     playSound('item');
                     createParticles(item.x + 11, item.y + 11, item.type === 'heal' ? '#22c55e' : '#eab308', 15);
@@ -330,11 +329,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
             let target = proj.owner === p1 ? p2 : p1;
             if (target.invincible <= 0 && checkCollision(proj, target)) {
-                target.hp -= proj.damage; // Mengurangi tepat 1 nyawa per peluru biasa
+                target.hp -= proj.damage;
                 target.vx = proj.vx > 0 ? 8 : -8;
                 target.vy = -4;
                 target.hitStun = 5;
-                target.invincible = 6; // Bebas dari kebal lebih cepat untuk tempo rapat
+                target.invincible = 6;
                 proj.owner.energy = Math.min(100, proj.owner.energy + 15);
 
                 playSound('hit');
@@ -379,24 +378,20 @@ window.addEventListener('DOMContentLoaded', () => {
         ctx.font = 'bold 14px sans-serif';
         ctx.fillText('🏹 ARCHER (P1)', 20, 20);
 
-        // Frame Bar HP P1
         ctx.fillStyle = '#0f172a';
         ctx.fillRect(20, 28, 260, 32);
         ctx.strokeStyle = '#334155';
         ctx.lineWidth = 3;
         ctx.strokeRect(20, 28, 260, 32);
 
-        // Isi Bar HP P1 (Persentase dari 100 HP)
         let hpWidthP1 = Math.max(0, (p1.hp / MAX_HP) * 256);
         ctx.fillStyle = p1.hp > 30 ? '#22c55e' : '#ef4444';
         ctx.fillRect(22, 30, hpWidthP1, 28);
 
-        // Teks Angka Nyawa P1 (100 -> 99 -> 98 dst.)
         ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 13px sans-serif';
         ctx.fillText(`${Math.max(0, Math.ceil(p1.hp))} / 100 HP`, 30, 49);
 
-        // Bar Energi P1
         ctx.fillStyle = '#0f172a';
         ctx.fillRect(20, 64, 260, 10);
         ctx.fillStyle = '#0284c7';
@@ -409,24 +404,20 @@ window.addEventListener('DOMContentLoaded', () => {
         ctx.textAlign = 'right';
         ctx.fillText(p2.isCPU ? '🔫 GUNNER (CPU)' : '🔫 GUNNER (P2)', 880, 20);
 
-        // Frame Bar HP P2
         ctx.fillStyle = '#0f172a';
         ctx.fillRect(620, 28, 260, 32);
         ctx.strokeStyle = '#334155';
         ctx.lineWidth = 3;
         ctx.strokeRect(620, 28, 260, 32);
 
-        // Isi Bar HP P2
         let hpWidthP2 = Math.max(0, (p2.hp / MAX_HP) * 256);
         ctx.fillStyle = p2.hp > 30 ? '#22c55e' : '#ef4444';
         ctx.fillRect(878 - hpWidthP2, 30, hpWidthP2, 28);
 
-        // Teks Angka Nyawa P2
         ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 13px sans-serif';
         ctx.fillText(`${Math.max(0, Math.ceil(p2.hp))} / 100 HP`, 870, 49);
 
-        // Bar Energi P2
         ctx.fillStyle = '#0f172a';
         ctx.fillRect(620, 64, 260, 10);
         ctx.fillStyle = '#0284c7';
@@ -447,6 +438,34 @@ window.addEventListener('DOMContentLoaded', () => {
         gameOverMenu.classList.add('hidden');
         requestAnimationFrame(gameLoop);
     }
+
+    // --- DI SINI LETAK KONTROL TOUCH UNTUK HP ---
+    function setupTouchControls() {
+        const bindTouch = (id, code) => {
+            const btn = document.getElementById(id);
+            if (!btn) return;
+
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                initAudio();
+                keys[code] = true;
+                if (code === 'KeyG') p1.shoot(true);
+            }, { passive: false });
+
+            btn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                keys[code] = false;
+            }, { passive: false });
+        };
+
+        bindTouch('t-left', 'KeyA');
+        bindTouch('t-right', 'KeyD');
+        bindTouch('t-up', 'KeyW');
+        bindTouch('t-shoot', 'KeyF');
+        bindTouch('t-super', 'KeyG');
+    }
+
+    setupTouchControls(); // Memanggil fungsi touch controls
 
     if (btnVsCpu) btnVsCpu.onclick = () => startGame(true);
     if (btnVsPlayer) btnVsPlayer.onclick = () => startGame(false);
