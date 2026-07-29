@@ -66,52 +66,70 @@ button {
 }
 
 /* --- OVERLAY KONTROL TOUCH (BESAR & SPREAD) --- */
+/* --- LAYOUT KONTROL TOUCH RESPANSIF --- */
 .touch-overlay {
     position: absolute;
-    top: 0; left: 0;
+    top: 0; 
+    left: 0;
     width: 100vw;
     height: 100vh;
     pointer-events: none;
     z-index: 10;
-}
-
-.p-controls {
-    position: absolute;
-    bottom: 15px;
-    left: 15px;
-    right: 15px;
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
+    padding: 10px 15px;
 }
 
-/* Tata letak P2 jika mode 2 Player aktif */
-.p2-layout {
-    top: 15px;
-    bottom: auto;
+.player-touch-zone {
+    position: relative;
+    width: 280px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .dpad, .actions {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     pointer-events: auto;
 }
 
-/* UKURAN TOMBOL JAUH LEBIH BESAR (72px x 72px) */
+/* Penataan Sisi Kiri (P1) */
+.p1-zone .top-actions {
+    margin-top: 10px;
+    justify-content: flex-start;
+}
+.p1-zone .bottom-dpad {
+    margin-bottom: 10px;
+    justify-content: flex-start;
+}
+
+/* Penataan Sisi Kanan (P2) */
+.p2-zone .top-dpad {
+    margin-top: 10px;
+    justify-content: flex-end;
+}
+.p2-zone .bottom-actions {
+    margin-bottom: 10px;
+    justify-content: flex-end;
+}
+
+/* UKURAN TOMBOL PRESISI & PAS DITEMPATKAN */
 .t-btn {
-    width: 72px;
-    height: 72px;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.25);
     border: 3px solid rgba(255, 255, 255, 0.6);
     color: white;
-    font-size: 26px;
+    font-size: 24px;
     font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: center;
     touch-action: none;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
 }
 
 .t-btn:active {
@@ -125,21 +143,20 @@ button {
 
 .action-btn {
     background: rgba(34, 197, 94, 0.6);
-    font-size: 28px;
+    font-size: 26px;
 }
 
 .super-btn {
-    background: rgba(234, 179, 8, 0.8);
-    font-size: 13px;
+    background: rgba(234, 179, 8, 0.85);
+    font-size: 11px;
     color: #000;
 }
 
-/* Tema Tombol P2 (Biru) */
+/* Tema Tombol Pemain 2 (Kanan) */
 .p2-theme {
-    background: rgba(6, 182, 212, 0.5);
-    border-color: rgba(6, 182, 212, 0.9);
+    background: rgba(6, 182, 212, 0.45);
+    border-color: rgba(6, 182, 212, 0.8);
 }
-
 /* Warning Rotate Portrait */
 #rotate-warning {
     display: none;
