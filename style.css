@@ -1,34 +1,45 @@
+/* Mencegah scroll dan double-tap zoom di seluruh halaman */
 * {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: manipulation; /* Mematikan gesture double-tap zoom */
 }
 
-body {
-    background-color: #0b0f19;
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
+body, html {
+    width: 100%;
+    height: 100%;
     overflow: hidden;
+    background-color: #020617;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #game-container {
     position: relative;
-    box-shadow: 0 0 30px rgba(56, 189, 248, 0.3);
-    border-radius: 12px;
-    overflow: hidden;
-    border: 3px solid #1e293b;
+    width: 100vw;
+    height: 100vh;
+    max-width: 900px;
+    max-height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 canvas {
-    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
     background: #0f172a;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
+/* UI Overlay / Menu */
 .ui-overlay {
     position: absolute;
     top: 0;
@@ -39,115 +50,137 @@ canvas {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: rgba(15, 23, 42, 0.88);
+    background: rgba(15, 23, 42, 0.92);
     backdrop-filter: blur(6px);
-    z-index: 10; /* Memastikan overlay di atas canvas */
+    z-index: 10;
+    color: white;
 }
 
 .hidden {
     display: none !important;
 }
 
+h1 {
+    font-size: 2.2rem;
+    margin-bottom: 5px;
+    color: #38bdf8;
+    text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+}
+
+.btn-group {
+    display: flex;
+    gap: 15px;
+    margin: 20px 0;
+}
+
 button {
-    padding: 14px 30px;
-    font-size: 1.1rem;
+    padding: 12px 24px;
+    font-size: 1rem;
     font-weight: bold;
     color: #fff;
     background: linear-gradient(135deg, #0284c7, #2563eb);
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4);
-    position: relative;
-    z-index: 20; /* Memastikan tombol di lapisan paling atas */
-    pointer-events: auto; /* Mengaktifkan klik tombol */
+    z-index: 20;
+    pointer-events: auto;
+    touch-action: manipulation;
 }
 
-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(2, 132, 199, 0.6);
-    background: linear-gradient(135deg, #38bdf8, #1d4ed8);
+button:active {
+    transform: scale(0.95);
 }
 
 .controls-card {
-    margin-top: 25px;
-    background: rgba(30, 41, 59, 0.8);
-    padding: 18px 25px;
-    border-radius: 10px;
-    font-size: 0.9rem;
-    color: #cbd5e1;
-    text-align: left;
-    border: 1px solid #334155;
     display: flex;
     gap: 30px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    color: #94a3b8;
 }
 
-.controls-card div {
-    flex: 1;
-}
-
-.controls-card h3 {
-    color: #38bdf8;
-    margin-bottom: 8px;
-    font-size: 1rem;
-}
-/* Kontrol Sentuh / Touch UI */
+/* KONTROL TOUCH PADA HP */
 .touch-overlay {
-    display: none; /* Sembunyikan secara bawaan di Desktop */
     position: absolute;
-    bottom: 10px;
+    bottom: 15px;
     left: 0;
     width: 100%;
-    padding: 0 15px;
-    box-sizing: border-box;
+    padding: 0 20px;
+    display: flex;
     justify-content: space-between;
-    pointer-events: none; /* Biar canvas tidak terhalang area kosong */
+    pointer-events: none;
     z-index: 5;
-}
-
-/* Tampilkan tombol jika diakses dari layar sentuh / mobile */
-@media (max-width: 900px), (pointer: coarse) {
-    .touch-overlay {
-        display: flex;
-    }
 }
 
 .touch-group {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     pointer-events: auto;
 }
 
 .t-btn {
-    width: 55px;
-    height: 55px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.25);
-    border: 2px solid rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.4);
     color: white;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: center;
-    user-select: none;
-    touch-action: manipulation;
-    padding: 0;
+    touch-action: none; /* Mencegah zoom saat ditekan cepat */
 }
 
 .t-btn:active {
-    background: rgba(255, 255, 255, 0.6);
-    transform: scale(0.95);
+    background: rgba(255, 255, 255, 0.5);
 }
 
 .action-btn {
-    background: rgba(34, 197, 94, 0.6);
+    background: rgba(34, 197, 94, 0.5);
 }
 
 .super-btn {
-    background: rgba(234, 179, 8, 0.7);
-    font-size: 11px;
-    width: 60px;
-    height: 60px;
+    background: rgba(234, 179, 8, 0.6);
+    font-size: 10px;
+}
+
+/* PERINGATAN ROTASI HP (PORTRAIT DETECTION) */
+#rotate-warning {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #090d16;
+    color: white;
+    z-index: 999;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+}
+
+.rotate-icon {
+    font-size: 50px;
+    margin-bottom: 15px;
+    animation: spin 2s infinite ease-in-out;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    50% { transform: rotate(90deg); }
+    100% { transform: rotate(0deg); }
+}
+
+/* Tampilkan Peringatan Jika Layar HP Masih Tegak (Portrait) */
+@media screen and (orientation: portrait) {
+    #rotate-warning {
+        display: flex;
+    }
 }
