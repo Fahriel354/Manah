@@ -361,28 +361,68 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     function drawUI() {
-        ctx.fillStyle = '#1e293b';
-        ctx.fillRect(20, 20, 220, 22);
-        ctx.fillStyle = '#22c55e';
-        ctx.fillRect(20, 20, Math.max(0, p1.hp * 2.2), 22);
-
-        ctx.fillStyle = '#0284c7';
-        ctx.fillRect(20, 48, p1.energy * 2.2, 8);
-
+        // --- UI PEMAIN 1 (KIRI) ---
+        // Label Nama & Status
         ctx.fillStyle = '#f8fafc';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.fillText('🏹 ARCHER (P1)', 20, 20);
+
+        // Frame / Background Bar HP P1 (Dibuat lebih tebal: tinggi 30px)
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(20, 28, 260, 30);
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(20, 28, 260, 30);
+
+        // Isi Bar HP P1
+        let hpWidthP1 = Math.max(0, (p1.hp / 100) * 256);
+        ctx.fillStyle = p1.hp > 30 ? '#22c55e' : '#ef4444'; // Merah jika kritis
+        ctx.fillRect(22, 30, hpWidthP1, 26);
+
+        // Teks Angka HP P1
+        ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 12px sans-serif';
-        ctx.fillText('🏹 ARCHER (P1)', 20, 15);
+        ctx.fillText(`${Math.max(0, Math.ceil(p1.hp))} / 100`, 30, 47);
 
-        ctx.fillStyle = '#1e293b';
-        ctx.fillRect(660, 20, 220, 22);
-        ctx.fillStyle = '#22c55e';
-        ctx.fillRect(660, 20, Math.max(0, p2.hp * 2.2), 22);
-
+        // Bar Energi P1 (Tinggi 10px)
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(20, 62, 260, 10);
         ctx.fillStyle = '#0284c7';
-        ctx.fillRect(660, 48, p2.energy * 2.2, 8);
+        ctx.fillRect(20, 62, (p1.energy / 100) * 260, 10);
 
+
+        // --- UI PEMAIN 2 / CPU (KANAN) ---
+        // Label Nama & Status
         ctx.fillStyle = '#f8fafc';
-        ctx.fillText(p2.isCPU ? '🔫 GUNNER (CPU)' : '🔫 GUNNER (P2)', 660, 15);
+        ctx.font = 'bold 14px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText(p2.isCPU ? '🔫 GUNNER (CPU)' : '🔫 GUNNER (P2)', 880, 20);
+
+        // Frame / Background Bar HP P2
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(620, 28, 260, 30);
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(620, 28, 260, 30);
+
+        // Isi Bar HP P2
+        let hpWidthP2 = Math.max(0, (p2.hp / 100) * 256);
+        ctx.fillStyle = p2.hp > 30 ? '#22c55e' : '#ef4444';
+        ctx.fillRect(878 - hpWidthP2, 30, hpWidthP2, 26);
+
+        // Teks Angka HP P2
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 12px sans-serif';
+        ctx.fillText(`${Math.max(0, Math.ceil(p2.hp))} / 100`, 870, 47);
+
+        // Bar Energi P2 (Tinggi 10px)
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(620, 62, 260, 10);
+        ctx.fillStyle = '#0284c7';
+        ctx.fillRect(880 - ((p2.energy / 100) * 260), 62, (p2.energy / 100) * 260, 10);
+
+        // Reset alignment teks
+        ctx.textAlign = 'left';
     }
 
     function startGame(vsCPU) {
