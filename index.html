@@ -69,6 +69,32 @@
         </div>
     </div>
 
+    <!-- KOTAK DEBUG: menampilkan error JS langsung di layar HP -->
+    <div id="debug-box" style="
+        display:none;
+        position:fixed;
+        bottom:0; left:0;
+        width:100%;
+        max-height:40%;
+        overflow:auto;
+        background:rgba(200,0,0,0.95);
+        color:#fff;
+        font-family:monospace;
+        font-size:12px;
+        padding:10px;
+        z-index:9999;
+        white-space:pre-wrap;
+        word-break:break-word;
+    "></div>
+
+    <script>
+        window.addEventListener('error', function(e) {
+            const box = document.getElementById('debug-box');
+            box.style.display = 'block';
+            box.textContent += '❌ ERROR: ' + e.message + '\n(baris ' + e.lineno + ', file ' + (e.filename ? e.filename.split('/').pop() : '?') + ')\n\n';
+        });
+    </script>
+
     <script src="script.js"></script>
 </body>
 </html>
