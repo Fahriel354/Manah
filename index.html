@@ -7,47 +7,67 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <div id="rotate-warning">
         <div class="rotate-icon">🔄</div>
         <p>MOHON PUTAR HP KAMU KESISI LANDSCAPE (MENDATAR)</p>
     </div>
 
-    <!-- OVERLAY KONTROL UNTUK 2 PEMAIN -->
-<!-- OVERLAY KONTROL UNTUK 2 PEMAIN -->
-<div id="touch-controls" class="touch-overlay">
-    
-    <!-- SISI KIRI: PEMAIN 1 (ARCHER) -->
-    <div id="p1-touch" class="player-touch-zone p1-zone">
-        <!-- Tombol Serang P1 (Atas Kiri) -->
-        <div class="actions top-actions">
-            <button id="t-shoot" class="t-btn action-btn">🏹</button>
-            <button id="t-super" class="t-btn super-btn">⚡ SUPER</button>
+    <div id="game-container">
+        <!-- CANVAS UTAMA TEMPAT GAME DIGAMBAR -->
+        <canvas id="gameCanvas" width="900" height="500"></canvas>
+
+        <!-- MENU UTAMA (MUNCUL SEBELUM GAME MULAI) -->
+        <div id="main-menu" class="ui-overlay">
+            <h1>PIXEL CLASH</h1>
+            <div class="btn-group">
+                <button id="btn-vs-cpu">VS CPU</button>
+                <button id="btn-vs-player">VS PLAYER (2P)</button>
+            </div>
         </div>
-        <!-- Tombol Arah P1 (Bawah Kiri) -->
-        <div class="dpad bottom-dpad">
-            <button id="t-left" class="t-btn">◄</button>
-            <button id="t-right" class="t-btn">►</button>
-            <button id="t-up" class="t-btn jump-btn">▲</button>
+
+        <!-- MENU GAME OVER (MUNCUL SAAT ADA YANG KALAH) -->
+        <div id="game-over-menu" class="ui-overlay hidden">
+            <h1 id="winner-title">MENANG!</h1>
+            <div class="btn-group">
+                <button id="btn-restart">MAIN LAGI</button>
+                <button id="btn-menu">MENU UTAMA</button>
+            </div>
+        </div>
+
+        <!-- OVERLAY KONTROL UNTUK 2 PEMAIN -->
+        <div id="touch-controls" class="touch-overlay">
+
+            <!-- SISI KIRI: PEMAIN 1 (ARCHER) -->
+            <div id="p1-touch" class="player-touch-zone p1-zone">
+                <!-- Tombol Serang P1 (Atas Kiri) -->
+                <div class="actions top-actions">
+                    <button id="t-shoot" class="t-btn action-btn">🏹</button>
+                    <button id="t-super" class="t-btn super-btn">⚡ SUPER</button>
+                </div>
+                <!-- Tombol Arah P1 (Bawah Kiri) -->
+                <div class="dpad bottom-dpad">
+                    <button id="t-left" class="t-btn">◄</button>
+                    <button id="t-right" class="t-btn">►</button>
+                    <button id="t-up" class="t-btn jump-btn">▲</button>
+                </div>
+            </div>
+
+            <!-- SISI KANAN: PEMAIN 2 (GUNNER) - HANYA MUNCUL SAAT MAIN 2P -->
+            <div id="p2-touch" class="player-touch-zone p2-zone hidden">
+                <!-- Tombol Arah P2 (Atas Kanan) -->
+                <div class="dpad top-dpad">
+                    <button id="t2-left" class="t-btn p2-theme">◄</button>
+                    <button id="t2-right" class="t-btn p2-theme">►</button>
+                    <button id="t2-up" class="t-btn jump-btn p2-theme">▲</button>
+                </div>
+                <!-- Tombol Serang P2 (Bawah Kanan) -->
+                <div class="actions bottom-actions">
+                    <button id="t2-shoot" class="t-btn action-btn p2-theme">🔫</button>
+                    <button id="t2-super" class="t-btn super-btn p2-theme">⚡ SUPER</button>
+                </div>
+            </div>
         </div>
     </div>
-
-    <!-- SISI KANAN: PEMAIN 2 (GUNNER) - HANYA MUNCUL SAAT MAIN 2P -->
-    <div id="p2-touch" class="player-touch-zone p2-zone hidden">
-        <!-- Tombol Arah P2 (Atas Kanan) -->
-        <div class="dpad top-dpad">
-            <button id="t2-left" class="t-btn p2-theme">◄</button>
-            <button id="t2-right" class="t-btn p2-theme">►</button>
-            <button id="t2-up" class="t-btn jump-btn p2-theme">▲</button>
-        </div>
-        <!-- Tombol Serang P2 (Bawah Kanan) -->
-        <div class="actions bottom-actions">
-            <button id="t2-shoot" class="t-btn action-btn p2-theme">🔫</button>
-            <button id="t2-super" class="t-btn super-btn p2-theme">⚡ SUPER</button>
-        </div>
-    </div>
-
-</div>
 
     <script src="script.js"></script>
 </body>
