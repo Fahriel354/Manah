@@ -90,6 +90,13 @@ window.addEventListener('DOMContentLoaded', () => {
         { x: 350, y: 200, w: 200, h: 16 }
     ];
 
+    // Dinding vertikal: bisa diinjak dari atas (seperti platform),
+    // tapi juga menghalangi pemain & peluru dari arah samping
+    const walls = [
+        { x: 440, y: 216, w: 20, h: 220 },  // Menggantung dari bawah platform tengah
+        { x: 440, y: 460, w: 20, h: 60 }    // Dinding kecil dekat lantai tengah
+    ];
+
     class Player {
         constructor(x, y, color, role, isCPU = false) {
             this.x = x;
@@ -127,6 +134,30 @@ window.addEventListener('DOMContentLoaded', () => {
                     this.y = p.y - this.h;
                     this.vy = 0;
                     this.isGrounded = true;
+                }
+            }
+
+            // Dinding: bisa diinjak dari atas seperti platform,
+            // tapi juga mendorong pemain balik kalau nabrak dari samping
+            for (let w of walls) {
+                let hitX = this.x + this.w > w.x && this.x < w.x + w.w;
+                let hitY = this.y + this.h > w.y && this.y < w.y + w.h;
+
+                if (hitX && hitY) {
+                    // Kalau lagi jatuh dan bagian bawah pemain nyaris sejajar atas dinding -> dianggap berdiri di atasnya
+                    if (this.vy >= 0 && this.y + this.h - this.vy <= w.y + 2) {
+                        this.y = w.y - this.h;
+                        this.vy = 0;
+                        this.isGrounded = true;
+                    } else {
+                        // Nabrak dari samping -> dorong balik ke arah datang
+                        if (this.x + this.w / 2 < w.x + w.w / 2) {
+                            this.x = w.x - this.w;
+                        } else {
+                            this.x = w.x + w.w;
+                        }
+                        this.vx = 0;
+                    }
                 }
             }
 
@@ -290,6 +321,15 @@ window.addEventListener('DOMContentLoaded', () => {
             ctx.fillStyle = '#334155';
         });
 
+        // Dinding
+        ctx.fillStyle = '#64748b';
+        walls.forEach(w => {
+            ctx.fillRect(w.x, w.y, w.w, w.h);
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillRect(w.x, w.y, w.w, 4);
+            ctx.fillStyle = '#64748b';
+        });
+
         // Items
         items.forEach((item, index) => {
             item.y += 3.5;
@@ -323,6 +363,13 @@ window.addEventListener('DOMContentLoaded', () => {
             platforms.forEach(p => {
                 if (checkCollision(proj, p)) {
                     createParticles(proj.x, proj.y, '#94a3b8', 6);
+                    projectiles.splice(pIndex, 1);
+                }
+            });
+
+            walls.forEach(w => {
+                if (checkCollision(proj, w)) {
+                    createParticles(proj.x, proj.y, '#cbd5e1', 6);
                     projectiles.splice(pIndex, 1);
                 }
             });
